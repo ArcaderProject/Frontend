@@ -51,11 +51,15 @@ EXT_TRIPLE="${EXT_RUST_TARGET%%.*}"
      "../../arcaderui/addons/unix-socket/libunixsocket.linux.release.${GD_LIB_ARCH}.so" )
 
 rm -rf build
-mkdir -p build/pkg
+mkdir -p build/pkg/addons/unix-socket
 ( cd arcaderui
   godot --headless --export-release "$GODOT_PRESET" ../build/pkg/arcaderui )
 
+cp arcaderui/addons/unix-socket/lib.gdextension build/pkg/addons/unix-socket/
+cp "arcaderui/addons/unix-socket/libunixsocket.linux.release.${GD_LIB_ARCH}.so" \
+   build/pkg/addons/unix-socket/
 cp arcader-frontend.json build/pkg/arcader-frontend.json
+
 TARBALL="arcaderui-linux-${ARCH}.tar.gz"
-( cd build/pkg && tar czf "../$TARBALL" arcaderui arcaderui.pck arcader-frontend.json )
+( cd build/pkg && tar czf "../$TARBALL" arcaderui arcaderui.pck arcader-frontend.json addons )
 echo "Built build/$TARBALL"
