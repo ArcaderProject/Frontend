@@ -16,6 +16,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 config/name="arcaderui"
 run/main_scene="uid://dvixy6d18px4f"
+run/max_fps=60
 config/features=PackedStringArray("4.6", "GL Compatibility")
 boot_splash/stretch_mode=0
 boot_splash/image="uid://otgvq38r1ita"
