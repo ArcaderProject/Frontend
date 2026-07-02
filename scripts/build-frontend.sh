@@ -31,15 +31,22 @@ echo "Building Arcader frontend for $ARCH (godot: $GODOT_PRESET, ext: $EXT_RUST_
 
 GODOT_VERSION=4.6
 TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
-if [ ! -f "$TEMPLATE_DIR/linux_release.x86_64" ]; then
-    echo "Godot export templates not found, downloading..."
+if [ ! -f "$TEMPLATE_DIR/linux_release.${GD_LIB_ARCH}" ]; then
+    # The official templates require SSE4.2 (enabled engine-wide and hard-checked at
+    # startup), so they abort on older CPUs (e.g. Core 2 Quad, SSSE3).
+    echo "Building custom Godot ${GD_LIB_ARCH} export template (SSE2 baseline)..."
+    command -v scons >/dev/null 2>&1 || { echo "Error: scons not installed"; exit 1; }
     mkdir -p "$TEMPLATE_DIR"
-    TEMP_DIR=$(mktemp -d)
-    ( cd "$TEMP_DIR"
-      wget -q "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
-      unzip -q "Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
-      cp templates/* "$TEMPLATE_DIR/" )
-    rm -rf "$TEMP_DIR"
+    SRC_DIR=$(mktemp -d)
+    git clone --depth 1 --branch "${GODOT_VERSION}-stable" https://github.com/godotengine/godot.git "$SRC_DIR"
+    sed -i 's/CCFLAGS=\["-msse4.2", "-mpopcnt"\]/CCFLAGS=[]/' "$SRC_DIR/SConstruct"
+    sed -i 's/if (!(cpuinfo\[2\] & (1 << 20)))/if (false)/' "$SRC_DIR/platform/linuxbsd/godot_linuxbsd.cpp"
+    ( cd "$SRC_DIR"
+      scons platform=linuxbsd target=template_release arch="${GD_LIB_ARCH}" \
+        module_raycast_enabled=no accesskit=no speechd=no wayland=no production=yes -j"$(nproc)" )
+    cp "$SRC_DIR/bin/godot.linuxbsd.template_release.${GD_LIB_ARCH}" "$TEMPLATE_DIR/linux_release.${GD_LIB_ARCH}"
+    echo "${GODOT_VERSION}.stable" > "$TEMPLATE_DIR/version.txt"
+    rm -rf "$SRC_DIR"
 fi
 
 echo "Building unix-socket GDExtension for $GD_LIB_ARCH ..."
