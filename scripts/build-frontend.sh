@@ -31,9 +31,9 @@ echo "Building Arcader frontend for $ARCH (godot: $GODOT_PRESET, ext: $EXT_RUST_
 
 GODOT_VERSION=4.6
 TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
-if [ ! -f "$TEMPLATE_DIR/linux_release.${GD_LIB_ARCH}" ]; then
-    # The official templates require SSE4.2 (enabled engine-wide and hard-checked at
-    # startup), so they abort on older CPUs (e.g. Core 2 Quad, SSSE3).
+# Godot's official x86_64 build enables SSE4.2 engine-wide AND hard-checks for it at startup,
+# so it aborts on older CPUs
+if [ "$GD_LIB_ARCH" = "x86_64" ]; then
     echo "Building custom Godot ${GD_LIB_ARCH} export template (SSE2 baseline)..."
     command -v scons >/dev/null 2>&1 || { echo "Error: scons not installed"; exit 1; }
     mkdir -p "$TEMPLATE_DIR"
