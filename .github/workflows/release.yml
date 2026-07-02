@@ -1,0 +1,69 @@
+name: Build Frontend
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            ext_triple: x86_64-unknown-linux-gnu
+          - arch: x86_32
+            ext_triple: i686-unknown-linux-gnu
+
+    env:
+      ARCH: ${{ matrix.arch }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ matrix.ext_triple }}
+
+    - name: Install zig
+      uses: mlugg/setup-zig@v2
+
+    - name: Install cargo-zigbuild
+      uses: taiki-e/install-action@v2
+      with:
+        tool: cargo-zigbuild
+
+    - name: Setup Godot
+      uses: chickensoft-games/setup-godot@v2
+      with:
+        version: 4.6.0
+        use-dotnet: false
+        include-templates: true
+
+    - name: Make scripts executable
+      run: chmod +x scripts/*.sh
+
+    - name: Build frontend
+      run: ./scripts/build-frontend.sh
+
+    - name: Upload tarball artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: arcaderui-${{ matrix.arch }}
+        path: build/arcaderui-linux-${{ matrix.arch }}.tar.gz
+        retention-days: 30
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: build/arcaderui-linux-${{ matrix.arch }}.tar.gz
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

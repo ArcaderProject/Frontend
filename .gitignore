@@ -1,0 +1,19 @@
+# Godot
+arcaderui/.godot/
+arcaderui/.import/
+*.translation
+
+# Rust (GDExtension)
+extensions/unixsocket/target/
+
+# Build output
+build/
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db

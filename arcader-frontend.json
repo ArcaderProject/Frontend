@@ -1,0 +1,17 @@
+{
+  "id": "main",
+  "name": "Arcader UI",
+  "description": "The official Godot frontend for Arcader.",
+  "author": "ArcaderProject",
+  "entry": "arcaderui",
+  "entryArgs": ["--fullscreen"],
+  "compatibility": { "arcaderd": ">=0.1.0" },
+  "release": {
+    "provider": "github",
+    "repo": "ArcaderProject/Frontend",
+    "assets": {
+      "x86_64": "arcaderui-linux-x86_64.tar.gz",
+      "x86_32": "arcaderui-linux-x86_32.tar.gz"
+    }
+  }
+}
