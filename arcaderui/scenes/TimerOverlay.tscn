@@ -14,7 +14,7 @@ corner_radius_bottom_left = 16
 
 [node name="TimerOverlay" type="Window"]
 title = "Timer"
-initial_position = 2
+initial_position = 0
 size = Vector2i(240, 96)
 min_size = Vector2i(240, 96)
 borderless = true
