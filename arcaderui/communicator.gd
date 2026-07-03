@@ -23,6 +23,9 @@ signal usb_status(data: Dictionary)
 signal usb_scan(data: Dictionary)
 signal usb_export_done(msg: Dictionary)
 signal usb_import_done(msg: Dictionary)
+signal config_prompt(data: Dictionary)
+signal config_captured(data: Dictionary)
+signal config_done(data: Dictionary)
 
 var pending_requests := {}
 var next_request_id := 0
@@ -112,6 +115,12 @@ func resume_game() -> void:
 func exit_game() -> void:
 	send_message({"type": "EXIT_GAME", "data": {}})
 
+func config_skip() -> void:
+	send_message({"type": "CONFIG_SKIP", "data": {}})
+
+func config_cancel() -> void:
+	send_message({"type": "CONFIG_CANCEL", "data": {}})
+
 func _generate_request_id() -> String:
 	next_request_id += 1
 	return "req_" + str(next_request_id)
@@ -179,6 +188,18 @@ func handle_message(msg: Dictionary) -> void:
 
 	if msg["type"] == "USB_PROGRESS":
 		emit_signal("usb_progress", msg.get("data", {}))
+		return
+
+	if msg["type"] == "CONFIG_PROMPT":
+		emit_signal("config_prompt", msg.get("data", {}))
+		return
+
+	if msg["type"] == "CONFIG_CAPTURED":
+		emit_signal("config_captured", msg.get("data", {}))
+		return
+
+	if msg["type"] == "CONFIG_DONE":
+		emit_signal("config_done", msg.get("data", {}))
 		return
 
 	if msg.has("requestId"):

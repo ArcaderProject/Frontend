@@ -6,6 +6,7 @@ const SCENE_GAMES_LIST = "res://scenes/GamesList.tscn"
 const SCENE_SEARCH = "res://scenes/Search.tscn"
 const SCENE_COIN = "res://scenes/CoinScreen.tscn"
 const SCENE_USB_TRANSFER = "res://scenes/UsbTransfer.tscn"
+const SCENE_CONTROLLER_CONFIG = "res://scenes/ControllerConfig.tscn"
 
 func _ready() -> void:
 	if Communicator.has_signal("screen_updated"):
@@ -19,6 +20,8 @@ func _on_screen_updated(screen: String) -> void:
 			get_tree().change_scene_to_file(SCENE_MAIN_MENU)
 		"COIN":
 			get_tree().change_scene_to_file(SCENE_COIN)
+		"CONTROLLER_CONFIG":
+			get_tree().change_scene_to_file(SCENE_CONTROLLER_CONFIG)
 
 func change_to_loading() -> void:
 	get_tree().change_scene_to_file(SCENE_LOADING)
