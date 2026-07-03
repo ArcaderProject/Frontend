@@ -8,11 +8,36 @@ const SCENE_COIN = "res://scenes/CoinScreen.tscn"
 const SCENE_USB_TRANSFER = "res://scenes/UsbTransfer.tscn"
 const SCENE_CONTROLLER_CONFIG = "res://scenes/ControllerConfig.tscn"
 
+const FPS_MENU := 30
+const FPS_GAME := 1
+const FPS_OVERLAY := 60
+
+var _in_game := false
+
 func _ready() -> void:
+	Engine.max_fps = FPS_MENU
 	if Communicator.has_signal("screen_updated"):
 		Communicator.screen_updated.connect(_on_screen_updated)
+	if Communicator.has_signal("game_started"):
+		Communicator.game_started.connect(_on_game_started)
+	if Communicator.has_signal("overlay_open"):
+		Communicator.overlay_open.connect(_on_overlay_open)
+	if Communicator.has_signal("overlay_close"):
+		Communicator.overlay_close.connect(_on_overlay_close)
+
+func _on_game_started(_game_info: Dictionary) -> void:
+	_in_game = true
+	Engine.max_fps = FPS_GAME
+
+func _on_overlay_open(_data: Dictionary) -> void:
+	Engine.max_fps = FPS_OVERLAY
+
+func _on_overlay_close() -> void:
+	Engine.max_fps = FPS_GAME if _in_game else FPS_MENU
 
 func _on_screen_updated(screen: String) -> void:
+	_in_game = false
+	Engine.max_fps = FPS_MENU
 	match screen:
 		"LOADING":
 			get_tree().change_scene_to_file(SCENE_LOADING)
